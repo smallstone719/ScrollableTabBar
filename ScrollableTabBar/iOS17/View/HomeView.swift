@@ -31,6 +31,9 @@ struct HomeView: View {
                 ScrollView(.horizontal) {
                     LazyHStack(spacing: 0) {
                         ForEach(tabs) { tab in
+                            /// Khi sử dụng .scrollTargetBehavior(.paging)
+                            /// cần lưu ý là content trong ScrollView phải fullscreen width
+                            /// nếu không thì paging sẽ không hoạt động chính xác.
                             Text(tab.id.rawValue)
                                 .frame(width: size.width, height: size.height)
                                 .contentShape(.rect)
@@ -41,9 +44,14 @@ struct HomeView: View {
                         progress = -rect.minX / size.width
                     }
                 }
+                /// Nó thì rất quan trọng để thông báo rằng scrollPosition
+                /// phải khớp với với id của tab trong vòng lặp
+                /// Trong trường hợp này id là 1 Tab enum được khai báo trong TabModel
                 .scrollPosition(id: $mainViewScrollState)
                 .scrollIndicators(.hidden)
                 .scrollTargetBehavior(.paging)
+                /// Cập nhật trạng thái của tabBar button khi mainView
+                /// thay đổi
                 .onChange(of: mainViewScrollState) { oldValue, newValue in
                     withAnimation(.snappy) {
                         tabBarScrollState = newValue
@@ -64,7 +72,6 @@ struct HomeView: View {
             Text("YouTube")
                 .font(.title2)
                 .fontWeight(.medium)
-//                .kerning(0.0)
                 .tracking(-0.5)
                 .fontWidth(.condensed)
             Spacer(minLength: 0)
@@ -125,6 +132,7 @@ struct HomeView: View {
             })
             .scrollTargetLayout()
         }
+        /// Đưa tab button được chọn vào trung tâm của màn hình
         .scrollPosition(id: .init(get: {
             return tabBarScrollState
         }, set: { _ in
